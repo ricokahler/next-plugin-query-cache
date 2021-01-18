@@ -1,7 +1,7 @@
 {
   "name": "next-plugin-query-cache",
   "version": "0.1.0-alpha.1",
-  "description": "",
+  "description": "A build-time query cache for Next.js.",
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
