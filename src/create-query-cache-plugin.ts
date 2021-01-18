@@ -1,5 +1,3 @@
-// TODO: get this from next.js instead of there
-import { DefinePlugin } from 'webpack';
 import express from 'express';
 import nodeFetch from 'node-fetch';
 import createRequestHandler from './create-request-handler';
@@ -43,6 +41,7 @@ function createQueryCachePlugin(pluginOptions?: QueryCachePluginOptions) {
             throw new Error('Could not get port');
           }
 
+          console.log(`[next-plugin-query-cache] Up on port ${address.port}.`);
           resolve(address.port);
         } catch (e) {
           reject(e);
@@ -83,14 +82,14 @@ function createQueryCachePlugin(pluginOptions?: QueryCachePluginOptions) {
           // ensure plugins is an array
           const plugins = (webpackConfig.plugins = webpackConfig.plugins || []);
 
-          const index = plugins.findIndex(
+          const definePlugin = plugins.find(
             (plugin) => plugin.constructor.name === 'DefinePlugin',
           );
 
-          const definePlugin = plugins[index] || new DefinePlugin({});
-
-          if (index === -1) {
-            plugins.push(definePlugin);
+          if (!definePlugin) {
+            throw new Error(
+              'Could not find DefinePlugin. This is an bug in next-plugin-query-cache.',
+            );
           }
 
           const port = portRef.current;
@@ -101,7 +100,7 @@ function createQueryCachePlugin(pluginOptions?: QueryCachePluginOptions) {
 
           definePlugin.definitions = {
             ...definePlugin.definitions,
-            'process.env.____NEXT_QUERY_CACHE_PORT': JSON.stringify(port),
+            'process.env.NEXT_QUERY_CACHE_PORT': JSON.stringify(port),
           };
 
           return webpackConfig;

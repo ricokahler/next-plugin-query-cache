@@ -51,6 +51,9 @@ In order to use the query cache, you must make queries via the `queryFetch` func
 import { createQueryFetch } from 'next-plugin-query-cache';
 
 export default createQueryFetch({
+  // this must be included. Get the assigned port via `NEXT_QUERY_CACHE_PORT`
+  port: process.env.NEXT_QUERY_CACHE_PORT,
+  //
   // // optionally provide a fetch implementation
   // fetch: window.fetch,
   //

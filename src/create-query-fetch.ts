@@ -2,6 +2,7 @@ export interface CreateQueryFetchOptions {
   getEnabled?: () => boolean | Promise<boolean>;
   canBeCached?: (url: string, options?: any) => boolean | Promise<boolean>;
   fetch?: (url: string, options?: any) => Promise<any>;
+  port: number | string | undefined;
 }
 
 const defaultCanBeCached = (url: string, options?: any) => {
@@ -20,9 +21,8 @@ function createQueryFetch({
   fetch = window.fetch,
   canBeCached = defaultCanBeCached,
   getEnabled = defaultGetEnabled,
-}: CreateQueryFetchOptions = {}) {
-  const port = process.env.____NEXT_QUERY_CACHE_PORT;
-
+  port,
+}: CreateQueryFetchOptions) {
   async function queryFetch(url: string, options?: RequestInit) {
     // if in browser, disabled, or can't be cached
     if (
