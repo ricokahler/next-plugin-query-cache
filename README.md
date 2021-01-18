@@ -8,6 +8,16 @@ I made this thing like yesterday. Watch for releases for stability.
 
 ## Installation
 
+```
+npm i next-plugin-query-cache
+```
+
+or
+
+```
+yarn add next-plugin-query-cache
+```
+
 ### 1. Add the decorator to your `next.config.js`
 
 ```js
