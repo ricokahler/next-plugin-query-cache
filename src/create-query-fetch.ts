@@ -23,16 +23,11 @@ function createQueryFetch({
 }: CreateQueryFetchOptions = {}) {
   const port = process.env.____NEXT_QUERY_CACHE_PORT;
 
-  if (!port) {
-    throw new Error(
-      'Could not get port. Ensure the plugin in included in next.config.js',
-    );
-  }
-
   async function queryFetch(url: string, options?: RequestInit) {
     // if in browser, disabled, or can't be cached
     if (
       typeof window === 'object' ||
+      !port ||
       !(await getEnabled()) ||
       !(await canBeCached(url, options))
     ) {

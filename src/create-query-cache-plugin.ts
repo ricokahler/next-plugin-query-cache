@@ -1,3 +1,4 @@
+// TODO: get this from next.js instead of there
 import { DefinePlugin } from 'webpack';
 import express from 'express';
 import nodeFetch from 'node-fetch';

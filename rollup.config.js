@@ -9,7 +9,7 @@ export default [
   {
     input: './src/index.ts',
     output: {
-      file: './dist/index.js',
+      file: './dist/index.esm.js',
       format: 'es',
       sourcemap: true,
     },
@@ -39,6 +39,25 @@ export default [
     input: './src/index.ts',
     output: {
       file: './dist/index.cjs.js',
+      format: 'cjs',
+      sourcemap: true,
+    },
+    plugins: [
+      resolve({ extensions, modulesOnly: true }),
+      babel({
+        babelrc: false,
+        configFile: false,
+        presets: ['@babel/preset-env', '@babel/preset-typescript'],
+        babelHelpers: 'bundled',
+        extensions,
+      }),
+    ],
+    external: ['regenerator-runtime/runtime', ...externals],
+  },
+  {
+    input: './src/config.ts',
+    output: {
+      file: './dist/config.cjs.js',
       format: 'cjs',
       sourcemap: true,
     },

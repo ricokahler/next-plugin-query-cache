@@ -23,7 +23,7 @@ yarn add next-plugin-query-cache
 ```js
 // next.config.js
 
-const { createQueryCachePlugin } = require('next-plugin-query-cache');
+const { createQueryCachePlugin } = require('next-plugin-query-cache/config');
 
 const withQueryCache = createQueryCachePlugin({
   // // optionally provide a fetch implementation

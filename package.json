@@ -1,6 +1,6 @@
 {
   "name": "next-plugin-query-cache",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.4",
   "description": "A build-time query cache for Next.js.",
   "private": true,
   "scripts": {
@@ -34,7 +34,8 @@
     "@types/express": "^4.17.11",
     "@types/node-fetch": "^2.5.8",
     "express": "^4.17.1",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "regenerator-runtime": "^0.13.7"
   },
   "peerDependencies": {
     "webpack": "^4|| ^5"

@@ -35,7 +35,15 @@ async function build() {
           'devDependencies',
         ]),
         main: './index.cjs.js',
-        exports: './index.js',
+        module: './index.esm.js',
+        exports: {
+          '.': {
+            require: './index.cjs.js',
+          },
+          './config': {
+            require: './config.cjs.js',
+          },
+        },
         types: './index.d.ts',
       },
       null,
