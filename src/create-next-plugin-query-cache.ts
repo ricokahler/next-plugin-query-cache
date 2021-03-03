@@ -6,6 +6,10 @@ export interface QueryCachePluginOptions {
   port?: number;
   disabled?: boolean;
   fetch?: (url: string, options?: any) => any;
+  calculateCacheKey?: (
+    url: string,
+    options?: RequestInit,
+  ) => string | Promise<string>;
 }
 
 interface WebpackConfig {
@@ -13,24 +17,25 @@ interface WebpackConfig {
 }
 
 interface NextConfigValue {
-  webpack?: (config: WebpackConfig) => WebpackConfig;
+  webpack?: (config: WebpackConfig, ...rest: any[]) => WebpackConfig;
   rewrites?: (...args: any[]) => any | Promise<any>;
   [key: string]: any;
 }
 
 type NextConfig = NextConfigValue | ((...args: any[]) => NextConfigValue);
 
-function createQueryCachePlugin(pluginOptions?: QueryCachePluginOptions) {
+function createNextPluginQueryCache(pluginOptions?: QueryCachePluginOptions) {
   const initialPort = pluginOptions?.port || 0;
   const portRef = { current: initialPort };
-  const requestHandler = createRequestHandler(
-    pluginOptions?.fetch || nodeFetch,
-  );
+  const requestHandler = createRequestHandler({
+    fetch: pluginOptions?.fetch || nodeFetch,
+    calculateCacheKey: pluginOptions?.calculateCacheKey,
+  });
 
   function startServer() {
     const app = express();
 
-    app.use(requestHandler);
+    app.use(express.json(), requestHandler);
 
     return new Promise<number>((resolve, reject) => {
       const server = app.listen(initialPort, () => {
@@ -50,7 +55,7 @@ function createQueryCachePlugin(pluginOptions?: QueryCachePluginOptions) {
     });
   }
 
-  function withNextQueryCache(_nextConfig?: NextConfig) {
+  function withNextPluginQueryCache(_nextConfig?: NextConfig) {
     if (pluginOptions?.disabled) {
       return _nextConfig;
     }
@@ -66,9 +71,9 @@ function createQueryCachePlugin(pluginOptions?: QueryCachePluginOptions) {
         // we hi-jack `rewrites` here because it lets us return a
         // promise (where the `webpack` prop does not).
         //
-        // it also seems like the promise resolves prior to the
-        // `webpack` function running anyway
+        // this function resolves prior to the `webpack` function running
         rewrites: async (...args: any[]) => {
+          // TODO: this runs too often
           const port = await startServer();
 
           portRef.current = port;
@@ -76,8 +81,8 @@ function createQueryCachePlugin(pluginOptions?: QueryCachePluginOptions) {
           // pipe the result through the original rewrites fn (if any)
           return nextConfig?.rewrites?.(...args) || [];
         },
-        webpack: (config: WebpackConfig) => {
-          const webpackConfig = nextConfig.webpack?.(config) || {};
+        webpack: (config: WebpackConfig, ...rest: any[]) => {
+          const webpackConfig = nextConfig.webpack?.(config, ...rest) || config;
 
           // ensure plugins is an array
           const plugins = (webpackConfig.plugins = webpackConfig.plugins || []);
@@ -109,7 +114,7 @@ function createQueryCachePlugin(pluginOptions?: QueryCachePluginOptions) {
     };
   }
 
-  return withNextQueryCache;
+  return withNextPluginQueryCache;
 }
 
-export default createQueryCachePlugin;
+export default createNextPluginQueryCache;

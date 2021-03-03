@@ -1,6 +1,6 @@
 {
   "name": "next-plugin-query-cache",
-  "version": "0.1.0-alpha.9",
+  "version": "0.2.0-alpha.1",
   "description": "A build-time query cache for Next.js.",
   "private": true,
   "scripts": {

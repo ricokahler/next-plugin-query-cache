@@ -4,83 +4,10 @@
 
 ## Status: ⚠️ Experimental
 
-I made this thing like yesterday. Watch for releases for stability.
+For now, just read the source code.
 
-## Installation
+## Goals
 
-```
-npm i next-plugin-query-cache
-```
-
-or
-
-```
-yarn add next-plugin-query-cache
-```
-
-### 1. Add the decorator to your `next.config.js`
-
-```js
-// next.config.js
-
-const { createQueryCachePlugin } = require('next-plugin-query-cache/config');
-
-const withQueryCache = createQueryCachePlugin({
-  // // optionally provide a fetch implementation
-  // fetch: require('node-fetch'),
-  //
-  // // optionally provide a flag to disable the plugin
-  // disabled: process.env.DISABLE_QUERY_CACHE,
-  //
-  // // optionally provide a binding port for the proxy
-  // // by default it will bind to a random ephemeral port assigned by the OS
-  // port: 4000,
-});
-
-module.exports = withQueryCache({
-  // optionally, you can include a next.js config
-});
-```
-
-### 2. Create and use the `queryFetch` function
-
-In order to use the query cache, you must make queries via the `queryFetch` function.
-
-```js
-// query-cache.js
-import { createQueryFetch } from 'next-plugin-query-cache';
-
-export default createQueryFetch({
-  // this must be included. Get the assigned port via `NEXT_QUERY_CACHE_PORT`
-  port: process.env.NEXT_QUERY_CACHE_PORT,
-  //
-  // // optionally provide a fetch implementation
-  // fetch: window.fetch,
-  //
-  // // optionally provide a function to tell whether or not the query cache
-  // // is enabled. if it returns false, the query cache will not run
-  // getEnabled: () => true,
-  //
-  // // optionally provide a function to determine whether or not the request
-  // // should be cached
-  // canBeCached: (url, options) => (options?.method || 'GET') === 'GET',
-});
-```
-
-```js
-// some-page.js
-import queryFetch from '../query-cache';
-
-export const getStaticProps = async (context) => {
-  // use the query fetch for cached responses during a build
-  const response = await queryFetch('..');
-
-  // ...
-
-  return {
-    props: {
-      /* ... */
-    },
-  };
-};
-```
+- Host a shared process where all requests will be proxied through.
+- De-dupe requests at the proxy level. Ensure only one inflight request for the same resource.
+- Create a process-level, in-memory query cache that benefits the runtime beyond the build (great for SSR, ISR, etc).
