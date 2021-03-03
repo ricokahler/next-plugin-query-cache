@@ -1,0 +1,12 @@
+dist
+node_modules
+scripts
+src
+.babelrc
+.eslintrc
+.prettierrc
+.gitignore
+.env
+package-lock.json
+rollup.config.js
+tsconfig.json

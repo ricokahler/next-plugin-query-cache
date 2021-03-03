@@ -3,7 +3,29 @@ import resolve from '@rollup/plugin-node-resolve';
 
 const extensions = ['.js', '.ts'];
 
-const externals = ['express', 'webpack', 'node-fetch'];
+const external = [/^@babel\/runtime/, 'express', 'webpack', 'node-fetch'];
+
+const plugins = [
+  resolve({ extensions, modulesOnly: true }),
+  babel({
+    babelrc: false,
+    configFile: false,
+    presets: [
+      // assumes node 10+ because that's the minimum version next.js supports
+      ['@babel/preset-env', { targets: 'node 10 and not IE 11' }],
+      '@babel/preset-typescript',
+    ],
+    plugins: [
+      '@babel/plugin-transform-runtime',
+      [
+        '@babel/plugin-proposal-object-rest-spread',
+        { loose: true, useBuiltIns: true },
+      ],
+    ],
+    babelHelpers: 'runtime',
+    extensions,
+  }),
+];
 
 export default [
   {
@@ -13,27 +35,8 @@ export default [
       format: 'es',
       sourcemap: true,
     },
-    plugins: [
-      resolve({ extensions, modulesOnly: true }),
-      babel({
-        babelrc: false,
-        configFile: false,
-        presets: [
-          ['@babel/preset-env', { targets: 'node 10 and not IE 11' }],
-          '@babel/preset-typescript',
-        ],
-        plugins: [
-          '@babel/plugin-transform-runtime',
-          [
-            '@babel/plugin-proposal-object-rest-spread',
-            { loose: true, useBuiltIns: true },
-          ],
-        ],
-        babelHelpers: 'runtime',
-        extensions,
-      }),
-    ],
-    external: [/^@babel\/runtime/, ...externals],
+    plugins,
+    external,
   },
   {
     input: './src/index.ts',
@@ -42,17 +45,8 @@ export default [
       format: 'cjs',
       sourcemap: true,
     },
-    plugins: [
-      resolve({ extensions, modulesOnly: true }),
-      babel({
-        babelrc: false,
-        configFile: false,
-        presets: ['@babel/preset-env', '@babel/preset-typescript'],
-        babelHelpers: 'bundled',
-        extensions,
-      }),
-    ],
-    external: ['regenerator-runtime/runtime', ...externals],
+    plugins,
+    external,
   },
   {
     input: './src/config.ts',
@@ -60,17 +54,9 @@ export default [
       file: './dist/config.cjs.js',
       format: 'cjs',
       sourcemap: true,
+      exports: 'auto',
     },
-    plugins: [
-      resolve({ extensions, modulesOnly: true }),
-      babel({
-        babelrc: false,
-        configFile: false,
-        presets: ['@babel/preset-env', '@babel/preset-typescript'],
-        babelHelpers: 'bundled',
-        extensions,
-      }),
-    ],
-    external: ['regenerator-runtime/runtime', ...externals],
+    plugins,
+    external,
   },
 ];

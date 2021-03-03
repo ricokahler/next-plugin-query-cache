@@ -11,3 +11,4 @@ For now, just read the source code.
 - Host a shared process where all requests will be proxied through.
 - De-dupe requests at the proxy level. Ensure only one inflight request for the same resource.
 - Create a process-level, in-memory query cache that benefits the runtime beyond the build (great for SSR, ISR, etc).
+- TODO: logging and debugging

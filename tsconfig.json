@@ -1,10 +1,16 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
     "strict": true,
-    "noEmit": true
-  }
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "./dist"
+  },
+  "exclude": ["**/*.test.ts"],
+  "include": ["src/**/*"]
 }

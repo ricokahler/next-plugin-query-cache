@@ -1,7 +1,6 @@
 import { Response as NodeFetchResponse } from 'node-fetch';
 
-const BaseResponse =
-  typeof Response === 'undefined' ? NodeFetchResponse : Response;
+const BaseResponse = typeof window === 'object' ? Response : NodeFetchResponse;
 
 export interface SerializedResponse {
   headers: Array<[string, string]>;

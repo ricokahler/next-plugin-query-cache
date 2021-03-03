@@ -1,4 +1,3 @@
-// import { Response as NodeFetchResponse } from 'node-fetch';
 import nodeFetch from 'node-fetch';
 import createPubSub from './create-pub-sub';
 import type { FetchLike, RequestState } from './types';
@@ -63,8 +62,7 @@ const proxyState = createPubSub<ProxyConnectionState>('initial_state');
 
 const cacheKeyEvents = createPubSub('');
 
-// have to grab from global, can't use window in next.js
-let globalFetch = typeof fetch !== 'undefined' ? fetch : nodeFetch;
+let globalFetch = typeof window === 'object' ? fetch : nodeFetch;
 
 function createQueryFetch({
   fetch = globalFetch,
@@ -84,10 +82,11 @@ function createQueryFetch({
 
     // in most next.js supported platforms, `CI` will be `true` during the build
     // but false when running in production (e.g. during SSR, ISR, etc)
-    if (
-      process.env.CI !== 'true' ||
-      process.env.NEXT_PLUGIN_QUERY_CACHE_ACTIVE
-    ) {
+    const proxyEnabled =
+      process.env.CI === 'true' ||
+      process.env.NEXT_PLUGIN_QUERY_CACHE_ACTIVE === 'true';
+
+    if (!proxyEnabled) {
       return false;
     }
 

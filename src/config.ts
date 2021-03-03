@@ -1,3 +1,1 @@
-import 'regenerator-runtime/runtime';
-
-export { default as createNextPluginQueryCache } from './create-next-plugin-query-cache';
+export { default } from './create-next-plugin-query-cache';
