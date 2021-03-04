@@ -7,8 +7,10 @@
   "module": "./dist/index.esm.js",
   "scripts": {
     "test": "jest",
-    "lint": "eslint ./src",
+    "semantic-release": "semantic-release",
     "build": "./scripts/build",
+    "lint": "eslint src",
+    "prepare": "npm run build",
     "format": "prettier . --write"
   },
   "author": {
