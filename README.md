@@ -9,8 +9,18 @@ Unlike Gatsby, Next.js does not provide any sort of shared data layer. This is n
 `next-plugin-query-cache` aims to do just that. During the build, it creates an HTTP proxy server that all concurrent build processes can go through to request a resource.
 
 - If the proxy already has the value, it'll return it instead of fetching it.
-- If a requested resource already has a request inflight, the proxy will wait till that request is finished before returning it.
-- There's also an optional in-memory cache made for per-page queries (e.g. after the build for SSR or ISR).
+- If a requested resource already has a request inflight, the proxy will wait till that request is finished instead of requesting it again.
+- There's also an optional in-memory cache made for de-duping request on a per-page level (useful for after the build in SSR or ISR).
+
+> ### 👋 Curious what the API looks like? [Jump to Usage](#usage)
+
+## Who is the library for?
+
+This lib is for Next.js users who create static builds. The query cache saves responses as they are requests so shared queries across pages (e.g. for header data) are de-duplicated.
+
+This is particularly useful if your Next.js site is powered by SaaS products that provide their API like headless CMSes and headless ecommerce platforms (and even more useful if those SaaS services charge per API request 😅).
+
+> 👋 **NOTE**: This lib is currenlty _not_ so useful for non-HTTP type of requests (e.g. database calls) since the query cache only works on an HTTP level. See [#4](https://github.com/ricokahler/next-plugin-query-cache/issues/4) for more details.
 
 ## Installation
 
@@ -135,9 +145,9 @@ export default queryFetch;
 
 ## Usage
 
-After you create the `queryFetch` function, use it like you would use the default fetch.
+After you [create the `queryFetch` function](#create-the-client-queryfetch-function), use it like you would use the native fetch function.
 
-Note that you should only use this `queryFetch` inside of `getStaticProps`.
+**When you request using fetch function, it'll check the cache first during the build.**
 
 ```js
 // /pages/my-page.js
