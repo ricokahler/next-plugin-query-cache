@@ -147,7 +147,7 @@ export default queryFetch;
 
 After you [create the `queryFetch` function](#create-the-client-queryfetch-function), use it like you would use the native fetch function.
 
-**When you request using fetch function, it'll check the cache first during the build.**
+**When you request using this `queryFetch` function, it'll check the cache first during the build. That's it!**
 
 ```js
 // /pages/my-page.js
