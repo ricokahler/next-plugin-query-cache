@@ -1,17 +1,3 @@
-import { Response as NodeFetchResponse } from 'node-fetch';
-
-const BaseResponse = typeof window === 'object' ? Response : NodeFetchResponse;
-
-export interface SerializedResponse {
-  headers: Array<[string, string]>;
-  ok: boolean;
-  redirected: boolean;
-  status: number;
-  statusText: string;
-  text: string;
-  url: string;
-}
-
 /**
  * Represents what is serialized and sent across the (local) wire to the proxy.
  *
@@ -29,32 +15,17 @@ export interface SerializedRequest {
   redirect?: RequestRedirect;
 }
 
-export class QueryFetchResponse extends BaseResponse {
-  // note: `response.type`, `response.trailer` (part of the Response interface)
-  // aren't supported
-  constructor(private _serializedResponse: SerializedResponse) {
-    super(_serializedResponse.text, {
-      headers: _serializedResponse.headers,
-      status: _serializedResponse.status,
-      statusText: _serializedResponse.statusText,
-    });
-  }
-
-  get ok() {
-    return this._serializedResponse.ok;
-  }
-
-  get redirected() {
-    return this._serializedResponse.redirected;
-  }
-
-  get url() {
-    return this._serializedResponse.url;
-  }
-
-  clone() {
-    return new QueryFetchResponse(this._serializedResponse);
-  }
+/**
+ * Represents what is serialized and sent across the (local) wire from the proxy.
+ */
+export interface SerializedResponse {
+  headers: Array<[string, string]>;
+  ok: boolean;
+  redirected: boolean;
+  status: number;
+  statusText: string;
+  text: string;
+  url: string;
 }
 
 const isIterable = (obj: unknown): obj is Iterable<any> => {
@@ -65,11 +36,14 @@ const isIterable = (obj: unknown): obj is Iterable<any> => {
 export function serializeRequest(url: string, options?: RequestInit) {
   const headers = options?.headers;
 
-  const normalizedHeaders = Array.isArray(headers)
+  const normalizedHeaders = (!headers
+    ? []
+    : Array.isArray(headers)
     ? (headers as [string, string][])
     : isIterable(headers)
     ? Array.from(headers)
-    : Object.entries(headers || {});
+    : Object.entries(headers)
+  ).map(([k, v]) => [k.toLowerCase().trim(), v] as [string, string]);
 
   const serializedRequest: SerializedRequest = {
     url,
@@ -84,7 +58,13 @@ export function serializeRequest(url: string, options?: RequestInit) {
   return serializedRequest;
 }
 
-export async function serializeResponse(response: Response) {
+export async function serializeResponse(
+  // this type is compatible with the node-fetch response types
+  response: Pick<
+    Response,
+    'text' | 'ok' | 'redirected' | 'status' | 'statusText' | 'url'
+  > & { headers: any }
+) {
   const serializedResponse: SerializedResponse = {
     text: await response.text(),
     headers: Array.from(response.headers),

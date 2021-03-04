@@ -1,7 +1,6 @@
-function createPubSub<T = void>(initialValue: T) {
+function createPubSub<T = void>() {
   type Listener = (t: T) => void;
   const listeners = new Set<Listener>();
-  const value = { current: initialValue };
 
   function subscribe(listener: Listener) {
     listeners.add(listener);
@@ -14,18 +13,12 @@ function createPubSub<T = void>(initialValue: T) {
   }
 
   function notify(t: T) {
-    value.current = t;
-
     for (const listener of listeners) {
       listener(t);
     }
   }
 
-  function getCurrent() {
-    return value.current;
-  }
-
-  return { subscribe, notify, getCurrent };
+  return { subscribe, notify };
 }
 
 export default createPubSub;

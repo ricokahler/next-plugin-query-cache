@@ -8,7 +8,7 @@ export interface QueryCachePluginOptions {
   fetch?: (url: string, options?: any) => any;
   calculateCacheKey?: (
     url: string,
-    options?: RequestInit,
+    options?: RequestInit
   ) => string | Promise<string>;
 }
 
@@ -88,12 +88,12 @@ function createNextPluginQueryCache(pluginOptions?: QueryCachePluginOptions) {
           const plugins = (webpackConfig.plugins = webpackConfig.plugins || []);
 
           const definePlugin = plugins.find(
-            (plugin) => plugin.constructor.name === 'DefinePlugin',
+            (plugin) => plugin.constructor.name === 'DefinePlugin'
           );
 
           if (!definePlugin) {
             throw new Error(
-              'Could not find DefinePlugin. This is an bug in next-plugin-query-cache.',
+              'Could not find DefinePlugin. This is an bug in next-plugin-query-cache.'
             );
           }
 
