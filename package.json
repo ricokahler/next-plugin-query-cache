@@ -1,6 +1,6 @@
 {
   "name": "next-plugin-query-cache",
-  "version": "0.2.0-alpha.1",
+  "version": "1.0.0",
   "description": "A build-time query cache for Next.js.",
   "private": true,
   "main": "./dist/index.cjs.js",
@@ -43,6 +43,7 @@
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
     "rollup": "^2.40.0",
+    "semantic-release": "^17.4.1",
     "typescript": "^4.2.2"
   },
   "dependencies": {
