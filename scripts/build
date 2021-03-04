@@ -2,9 +2,6 @@
 echo Cleaning…
 rm -rf dist
 
-echo Installing…
-npm i
-
 echo Linting…
 npm run lint
 
@@ -13,3 +10,4 @@ npx tsc
 
 echo Rolling…
 npx rollup -c
+
