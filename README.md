@@ -1,4 +1,5 @@
-# next-plugin-query-cache
+# next-plugin-query-cache · [![codecov](https://codecov.io/gh/ricokahler/next-plugin-query-cache/branch/main/graph/badge.svg?token=CKKTKQ5A5Z)](https://codecov.io/gh/ricokahler/next-plugin-query-cache) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+
 
 > A build-time query cache for Next.js. Works by creating an HTTP server during the build that caches responses.
 
