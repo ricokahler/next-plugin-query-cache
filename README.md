@@ -16,9 +16,9 @@ Unlike Gatsby, Next.js does not provide any sort of shared data layer. This is n
 
 ## Who is the library for?
 
-This lib is for Next.js users who create static builds. The query cache saves responses as they are requests so shared queries across pages (e.g. for header data) are de-duplicated.
+This lib is for Next.js users who create static builds. The query cache saves responses as they are requested so shared queries across pages (e.g. for header data) are de-duplicated.
 
-This is particularly useful if your Next.js site is powered by SaaS products that provide their API like headless CMSes and headless ecommerce platforms (and even more useful if those SaaS services charge per API request 😅).
+This is particularly useful if your Next.js site is powered by SaaS products that provide their API over HTTP like headless CMSes and headless ecommerce platforms (and even more useful if those SaaS services charge per API request 😅).
 
 > 👋 **NOTE**: This lib is currenlty _not_ so useful for non-HTTP type of requests (e.g. database calls) since the query cache only works on an HTTP level. See [#4](https://github.com/ricokahler/next-plugin-query-cache/issues/4) for more details.
 
