@@ -132,7 +132,7 @@ const { queryFetch, cache } = createQueryFetch({
    * NOTE: ensure this matches the `calculateCacheKey` implementation
    * provided in `createNextPluginQueryCache`
    */
-  calculateCacheKey: (url) => url,
+  calculateCacheKey: (url, options) => url,
 });
 
 // the cache is an ES6 `Map` of cache keys to saved responses.
