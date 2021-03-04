@@ -57,6 +57,12 @@ const defaultShouldCache = (url: string, options?: any) => {
   return method === 'GET' && typeof url === 'string';
 };
 
+const defaultGetProxyEnabled = () =>
+  (process.env.CI === 'true' ||
+    process.env.NEXT_PLUGIN_QUERY_CACHE_ACTIVE === 'true') &&
+  // ensure `NEXT_QUERY_CACHE_PORT` is available
+  !!process.env.NEXT_QUERY_CACHE_PORT;
+
 const cacheKeyEvents = createPubSub<string>();
 
 let globalFetch = typeof window === 'object' ? fetch : nodeFetch;
@@ -64,9 +70,7 @@ let globalFetch = typeof window === 'object' ? fetch : nodeFetch;
 function createQueryFetch({
   fetch = globalFetch,
   shouldCache = defaultShouldCache,
-  getProxyEnabled = () =>
-    process.env.CI === 'true' ||
-    process.env.NEXT_PLUGIN_QUERY_CACHE_ACTIVE === 'true',
+  getProxyEnabled = defaultGetProxyEnabled,
   getInMemoryCacheEnabled = () => true,
   calculateCacheKey = (url) => url,
   port,

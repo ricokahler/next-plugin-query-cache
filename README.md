@@ -103,8 +103,9 @@ const { queryFetch, cache } = createQueryFetch({
    * the default implementation is shown here.
    */
   getProxyEnabled: async () =>
-    process.env.CI === 'true' ||
-    process.env.NEXT_PLUGIN_QUERY_CACHE_ACTIVE === 'true',
+    (process.env.CI === 'true' ||
+      process.env.NEXT_PLUGIN_QUERY_CACHE_ACTIVE === 'true') &&
+    !!process.env.NEXT_QUERY_CACHE_PORT,
 
   /**
    * (optional) provide a function that determines whether or not
