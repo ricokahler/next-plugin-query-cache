@@ -3,9 +3,24 @@ import nodeFetch from 'node-fetch';
 import createRequestHandler from './create-request-handler';
 
 export interface QueryCachePluginOptions {
+  /**
+   * If you have a preferred port for the proxy server, you can set it here.
+   * otherwise, it'll pick an ephemeral port
+   */
   port?: number;
-  disabled?: boolean;
+  /**
+   * Provide a flag that will disable the proxy. This could an expression that
+   * checks an environment variable or similar.
+   */
+  disableProxy?: boolean;
+  /**
+   * Provide a fetch implementation that the proxy will use
+   */
   fetch?: (url: string, options?: any) => any;
+  /**
+   * Provide a function that returns a string. The response result will be saved
+   * under that key in the cache.
+   */
   calculateCacheKey?: (
     url: string,
     options?: RequestInit
@@ -32,12 +47,16 @@ function createNextPluginQueryCache(pluginOptions?: QueryCachePluginOptions) {
     calculateCacheKey: pluginOptions?.calculateCacheKey,
   });
 
-  function startServer() {
+  async function startServer() {
+    if (pluginOptions?.disableProxy) {
+      return null;
+    }
+
     const app = express();
 
     app.use(express.json(), requestHandler);
 
-    return new Promise<number>((resolve, reject) => {
+    return await new Promise<number>((resolve, reject) => {
       const server = app.listen(initialPort, () => {
         try {
           const address = server.address();
@@ -56,7 +75,7 @@ function createNextPluginQueryCache(pluginOptions?: QueryCachePluginOptions) {
   }
 
   function withNextPluginQueryCache(_nextConfig?: NextConfig) {
-    if (pluginOptions?.disabled) {
+    if (pluginOptions?.disableProxy) {
       return _nextConfig;
     }
 
@@ -76,7 +95,9 @@ function createNextPluginQueryCache(pluginOptions?: QueryCachePluginOptions) {
           // TODO: this runs too often
           const port = await startServer();
 
-          portRef.current = port;
+          if (port) {
+            portRef.current = port;
+          }
 
           // pipe the result through the original rewrites fn (if any)
           return nextConfig?.rewrites?.(...args) || [];
@@ -93,14 +114,16 @@ function createNextPluginQueryCache(pluginOptions?: QueryCachePluginOptions) {
 
           if (!definePlugin) {
             throw new Error(
-              'Could not find DefinePlugin. This is an bug in next-plugin-query-cache.'
+              '[next-plugin-query-cache] Could not find DefinePlugin. Please file an issue.'
             );
           }
 
           const port = portRef.current;
 
           if (!port) {
-            throw new Error('Could not get port in time');
+            throw new Error(
+              '[next-plugin-query-cache] Could not get port Please file an issue'
+            );
           }
 
           definePlugin.definitions = {
