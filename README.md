@@ -4,7 +4,7 @@
 
 ## Who is the library for?
 
-This lib is for Next.js users who create static builds. The query cache saves responses as they are requested so shared queries across pages (e.g. for header data) are de-duplicated.
+This lib is for Next.js users who create static (or partially static) builds. The query cache saves responses as they are requested so shared queries across pages (e.g. for header data) are de-duplicated.
 
 This is particularly useful if your Next.js site is powered by SaaS products that provide their API over HTTP like headless CMSes and headless ecommerce platforms (and even more useful if those SaaS services charge per API request 😅).
 
