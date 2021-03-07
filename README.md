@@ -143,6 +143,23 @@ cache.clear();
 export default queryFetch;
 ```
 
+### Update your build command
+
+Assign the environmnt variable `NEXT_PLUGIN_QUERY_CACHE_ACTIVE` to enable query caching.
+
+This is dependent on the default `getProxyEnabled` function.
+
+```js
+// package.json
+{
+  "scripts": {
+    "build": "NEXT_PLUGIN_QUERY_CACHE_ACTIVE=true next build"
+    // ...
+  }
+  // ...
+}
+```
+
 ## Usage
 
 After you [create the `queryFetch` function](#create-the-client-queryfetch-function), use it like you would use the native fetch function.
