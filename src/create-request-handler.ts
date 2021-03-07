@@ -2,6 +2,7 @@ import { RequestHandler } from 'express';
 import { SerializedRequest, serializeResponse } from './serialize';
 import type { FetchLike, RequestState } from './types';
 import createPubSub from './create-pub-sub';
+import reporter from './reporter';
 
 interface RequestListenerOptions {
   fetch: FetchLike;
@@ -24,6 +25,13 @@ function createRequestListener({
       const cacheKey = await calculateCacheKey(serializedRequest.url);
 
       const requestState = cache.get(cacheKey) || { state: 'initial' };
+
+      if (
+        process.env.NEXT_PUBLIC_QUERY_CACHE_DEBUG &&
+        (requestState.state === 'inflight' || requestState.state === 'resolved')
+      ) {
+        reporter(cacheKey, 'server-cache');
+      }
 
       switch (requestState.state) {
         case 'resolved': {

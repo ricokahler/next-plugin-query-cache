@@ -56,5 +56,8 @@
   },
   "peerDependencies": {
     "next": "^9.3|| ^10"
+  },
+  "bin": {
+    "npqc-create-report": "./bin/npqc-create-report"
   }
 }

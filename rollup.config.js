@@ -27,7 +27,7 @@ const plugins = [
   }),
 ];
 
-export default [
+const config = [
   {
     input: './src/index.ts',
     output: {
@@ -59,4 +59,15 @@ export default [
     plugins,
     external,
   },
+  {
+    input: './src/create-report.ts',
+    output: {
+      file: './dist/create-report.cjs.js',
+      format: 'cjs',
+      sourcemap: true,
+    },
+    plugins,
+  },
 ];
+
+export default config;

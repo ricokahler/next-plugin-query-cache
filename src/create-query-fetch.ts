@@ -7,6 +7,7 @@ import {
   serializeResponse,
 } from './serialize';
 import QueryFetchResponse from './query-fetch-response';
+import reporter from './reporter';
 
 export interface CreateQueryFetchOptions {
   /**
@@ -127,6 +128,13 @@ function createQueryFetch({
 
     const cacheKey = await calculateCacheKey(url, options);
     const requestState = cache.get(cacheKey) || { state: 'initial' };
+
+    if (
+      process.env.NEXT_PUBLIC_QUERY_CACHE_DEBUG &&
+      (requestState.state === 'inflight' || requestState.state === 'resolved')
+    ) {
+      reporter(cacheKey, 'memory-cache');
+    }
 
     switch (requestState.state) {
       case 'resolved': {
