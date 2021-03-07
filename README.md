@@ -195,3 +195,19 @@ function MyPage({ data }) {
 
 export default MyPage;
 ```
+
+## FAQ
+
+### How does the proxy work?
+
+The proxy isn't a formal proxy (e.g. SOCKS5) but instead an HTTP service that serializes the arguments and results from [`window.fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) [`Request`s](https://developer.mozilla.org/en-US/docs/Web/API/Request) and [`Response`s](https://developer.mozilla.org/en-US/docs/Web/API/Response).
+
+This approach works well with the provided `fetch`-based API and doesn't require stateful connections other proxy protocols require. The downside to this is that the current API is only limited to serializing requests and responses with simple text as the payload bodies.
+
+### Does this work in [ISR](https://nextjs.org/docs/basic-features/data-fetching#incremental-static-regeneration)/[SSR](https://nextjs.org/docs/basic-features/data-fetching#getserversideprops-server-side-rendering)?
+
+After the build, only the in-memory cache will work (which still does request de-duping!). The proxy is only available during the build (and is only needed during the build due to concurrent build processes).
+
+Whether or not the `queryFetch` function calls the proxy is dependent on how you configure the `getProxyEnabled` function in the `createQueryFetch` call. The default implementation looks for either the `process.env.CI` environment variable or `process.env.NEXT_PLUGIN_QUERY_CACHE_ACTIVE` variable. If either of those are `'true'`, it'll request through the proxy.
+
+`process.env.CI` is a nice one to use since it's set by Vercel during the build but isn't set during SSR/ISR etc.
