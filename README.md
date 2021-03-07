@@ -162,6 +162,8 @@ This is dependent on the default `getProxyEnabled` function.
 
 ## Usage
 
+### Using the `queryFetch` function
+
 After you [create the `queryFetch` function](#create-the-client-queryfetch-function), use it like you would use the native fetch function.
 
 **When you request using this `queryFetch` function, it'll check the cache first during the build. That's it!**
@@ -196,13 +198,40 @@ function MyPage({ data }) {
 export default MyPage;
 ```
 
+### Debugging and logging
+
+`next-plugin-query-cache` ships with a logger and a report creator to help you debug the query cache.
+
+> 👋 **NOTE**: The Next.js build does not provide an end build event, so we result to logging as the cache hits happen. When the build is finished, we run script that reads the logged output and aggregates the numbers. If you have ideas on how to improve this features, feel free to [open an issue](https://github.com/ricokahler/next-plugin-query-cache/issues)!
+
+In order to run the logger and reporter, run the following command:
+
+```
+NEXT_PUBLIC_QUERY_CACHE_DEBUG=true npm run build | npx npqc-create-report
+```
+
+This will set the environment variable `NEXT_PUBLIC_QUERY_CACHE_DEBUG`, run the build, and then pipe the result into the reporter.
+
+If all goes well, you'll this message:
+
+```
+=== Next Plugin Query Cache ===
+   1952 total cache hits.
+   1816 hits in memory.
+    136 hits in the proxy.
+      3 build processes found.
+===============================
+
+Wrote out extended report out to ../next-plugin-query-cache-2021-03-07T21:55:23.098Z.csv
+```
+
 ## FAQ
 
 ### How does the proxy work?
 
 The proxy isn't a formal proxy (e.g. SOCKS5) but instead an HTTP service that serializes the arguments and results from [`window.fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) [`Request`s](https://developer.mozilla.org/en-US/docs/Web/API/Request) and [`Response`s](https://developer.mozilla.org/en-US/docs/Web/API/Response).
 
-This approach works well with the provided `fetch`-based API and doesn't require stateful connections other proxy protocols require. The downside to this is that the current API is only limited to serializing requests and responses with simple text as the payload bodies.
+This approach works well with the provided `fetch`-based API and doesn't require stateful connections that other proxy protocols require. The downside to this is that the current API is only limited to serializing requests and responses with simple text as the payload bodies.
 
 ### Does this work in [ISR](https://nextjs.org/docs/basic-features/data-fetching#incremental-static-regeneration)/[SSR](https://nextjs.org/docs/basic-features/data-fetching#getserversideprops-server-side-rendering)?
 
