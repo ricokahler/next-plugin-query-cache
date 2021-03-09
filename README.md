@@ -2,13 +2,40 @@
 
 > A build-time query cache for Next.js. Works by creating an HTTP server during the build that caches responses.
 
+## Quick Glance
+
+```js
+// 1) import a configured fetch function
+import queryFetch from '../query-fetch';
+
+export const getStaticProps = async () => {
+  // 2) use the fetch inside of `getStaticProps` or `getStaticPaths`.
+  // This function will check the cache first before making an outbound request
+  const response = await queryFetch('https://some-service.com', {
+    headers: {
+      accept: 'application/json',
+    },
+  });
+
+  const data = await response.json();
+
+  return { props: { data } };
+};
+
+function MyPage({ data }) {
+  return // ...
+}
+
+export default MyPage;
+```
+
 ## Who is the library for?
 
 This lib is for Next.js users who create static (or partially static) builds. The query cache saves responses as they are requested so shared queries across pages (e.g. for header data) are de-duplicated.
 
 This is particularly useful if your Next.js site is powered by SaaS products that provide their API over HTTP like headless CMSes and headless ecommerce platforms (and even more useful if those SaaS services charge per API request 😅).
 
-> 👋 **NOTE**: This lib is currenlty _not_ so useful for non-HTTP type of requests (e.g. database calls) since the query cache only works on an HTTP level. See [#4](https://github.com/ricokahler/next-plugin-query-cache/issues/4) for more details.
+> 👋 **NOTE**: This lib is currently _not_ so useful for non-HTTP type of requests (e.g. database calls) since the query cache only works on an HTTP level. See [#4](https://github.com/ricokahler/next-plugin-query-cache/issues/4) for more details.
 
 ## Motivation
 
@@ -19,8 +46,6 @@ Unlike Gatsby, Next.js does not provide any sort of shared data layer. This is n
 - If the proxy already has the value, it'll return it instead of fetching it.
 - If a requested resource already has a request inflight, the proxy will wait till that request is finished instead of requesting it again.
 - There's also an optional in-memory cache made for de-duping request on a per-page level (useful for after the build in SSR or ISR).
-
-> ### 👋 Curious what the API looks like? [Jump to Usage](#usage)
 
 ## Installation
 
