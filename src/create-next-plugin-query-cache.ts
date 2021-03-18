@@ -51,6 +51,39 @@ function createNextPluginQueryCache(pluginOptions?: QueryCachePluginOptions) {
   });
   const buildFinished = createPubSub();
 
+  // conditional here is for older versions of next
+  if ('traceGlobals' in nextTrace) {
+    // intentionally un-awaited async function.
+    setTimeout(async () => {
+      // unfortunately, we do have to poll for when this object comes into
+      // the `traceGlobals` map.
+      while (!nextTrace.traceGlobals.has('telemetry')) {
+        await new Promise((resolve) => setTimeout(resolve, 250));
+      }
+
+      // using as ts-ignore for previous versions of next
+      const telemetry: Telemetry = nextTrace.traceGlobals.get('telemetry');
+
+      if (telemetry && 'flush' in telemetry) {
+        // the bind isn't necessary atm but if they change the implementation
+        // to not an arrow function, the bind would prevent a break.
+        //
+        // using as ts-ignore for previous versions of next
+        // @ts-ignore
+        const originalFlush = telemetry.flush.bind(telemetry);
+
+        // hi-jack flush to emit an event when that occurs
+        Object.assign(telemetry, {
+          flush: (...args: any[]) => {
+            buildFinished.notify();
+            // @ts-ignore
+            return originalFlush(...args);
+          },
+        });
+      }
+    }, 0);
+  }
+
   async function startServer() {
     if (pluginOptions?.disableProxy) {
       return null;
@@ -91,29 +124,6 @@ function createNextPluginQueryCache(pluginOptions?: QueryCachePluginOptions) {
 
     const normalizedNextConfig =
       typeof _nextConfig === 'function' ? _nextConfig : () => _nextConfig || {};
-
-    if ('traceGlobals' in nextTrace) {
-      const telemetry: Telemetry | undefined = nextTrace.traceGlobals.get(
-        'telemetry'
-      );
-
-      if (telemetry && 'flush' in telemetry) {
-        // the bind isn't necessary atm but if they change the implementation
-        // to not an arrow function, the bind would prevent a break
-        // (using as ts-ignore for previous versions of next)
-        // @ts-ignore
-        const originalFlush = telemetry.flush.bind(telemetry);
-
-        // hi-jack flush to emit an event when that occurs
-        Object.assign(telemetry, {
-          flush: (...args: any[]) => {
-            buildFinished.notify();
-            // @ts-ignore
-            return originalFlush(...args);
-          },
-        });
-      }
-    }
 
     return (...args: any[]) => {
       const nextConfig = normalizedNextConfig(...args);
