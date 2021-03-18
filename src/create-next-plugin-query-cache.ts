@@ -1,6 +1,9 @@
 import express from 'express';
 import nodeFetch from 'node-fetch';
 import createRequestHandler from './create-request-handler';
+import { traceGlobals } from 'next/dist/telemetry/trace/shared';
+import type { Telemetry } from 'next/dist/telemetry/storage';
+import createPubSub from './create-pub-sub';
 
 export interface QueryCachePluginOptions {
   /**
@@ -46,6 +49,30 @@ function createNextPluginQueryCache(pluginOptions?: QueryCachePluginOptions) {
     fetch: pluginOptions?.fetch || nodeFetch,
     calculateCacheKey: pluginOptions?.calculateCacheKey,
   });
+  const buildFinished = createPubSub();
+
+  setTimeout(async () => {
+    // unfortunately, we do have to poll for when this object comes into
+    // the `traceGlobals` map.
+    while (!traceGlobals.has('telemetry')) {
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+
+    const telemetry: Telemetry = traceGlobals.get('telemetry');
+
+    if (telemetry && 'flush' in telemetry) {
+      const originalFlush = telemetry.flush.bind(telemetry);
+
+      // hi-jack flush to emit an event when that occurs
+      Object.assign(telemetry, {
+        flush: (...args: any[]) => {
+          buildFinished.notify();
+          // @ts-ignore
+          return originalFlush(...args);
+        },
+      });
+    }
+  }, 0);
 
   async function startServer() {
     if (pluginOptions?.disableProxy) {
@@ -70,6 +97,12 @@ function createNextPluginQueryCache(pluginOptions?: QueryCachePluginOptions) {
         } catch (e) {
           reject(e);
         }
+      });
+
+      // TODO: this event could be used in future version to create better
+      // reporting mechanisms
+      buildFinished.subscribe(() => {
+        server.close();
       });
     });
   }
