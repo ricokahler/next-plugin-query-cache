@@ -1,6 +1,9 @@
 import express from 'express';
 import nodeFetch from 'node-fetch';
 import createRequestHandler from './create-request-handler';
+import * as nextTrace from 'next/dist/telemetry/trace/shared';
+import type { Telemetry } from 'next/dist/telemetry/storage';
+import createPubSub from './create-pub-sub';
 
 export interface QueryCachePluginOptions {
   /**
@@ -46,6 +49,7 @@ function createNextPluginQueryCache(pluginOptions?: QueryCachePluginOptions) {
     fetch: pluginOptions?.fetch || nodeFetch,
     calculateCacheKey: pluginOptions?.calculateCacheKey,
   });
+  const buildFinished = createPubSub();
 
   async function startServer() {
     if (pluginOptions?.disableProxy) {
@@ -71,6 +75,12 @@ function createNextPluginQueryCache(pluginOptions?: QueryCachePluginOptions) {
           reject(e);
         }
       });
+
+      // TODO: this event could be used in future version to create better
+      // reporting mechanisms
+      buildFinished.subscribe(() => {
+        server.close();
+      });
     });
   }
 
@@ -81,6 +91,29 @@ function createNextPluginQueryCache(pluginOptions?: QueryCachePluginOptions) {
 
     const normalizedNextConfig =
       typeof _nextConfig === 'function' ? _nextConfig : () => _nextConfig || {};
+
+    if ('traceGlobals' in nextTrace) {
+      const telemetry: Telemetry | undefined = nextTrace.traceGlobals.get(
+        'telemetry'
+      );
+
+      if (telemetry && 'flush' in telemetry) {
+        // the bind isn't necessary atm but if they change the implementation
+        // to not an arrow function, the bind would prevent a break
+        // (using as ts-ignore for previous versions of next)
+        // @ts-ignore
+        const originalFlush = telemetry.flush.bind(telemetry);
+
+        // hi-jack flush to emit an event when that occurs
+        Object.assign(telemetry, {
+          flush: (...args: any[]) => {
+            buildFinished.notify();
+            // @ts-ignore
+            return originalFlush(...args);
+          },
+        });
+      }
+    }
 
     return (...args: any[]) => {
       const nextConfig = normalizedNextConfig(...args);
