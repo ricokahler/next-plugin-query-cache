@@ -1,6 +1,6 @@
 {
   "name": "next-plugin-query-cache",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A build-time query cache for Next.js.",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.esm.js",
@@ -56,7 +56,7 @@
     "node-fetch": "^2.6.1"
   },
   "peerDependencies": {
-    "next": "^9.3|| ^10"
+    "next": "^10.0.9"
   },
   "bin": {
     "npqc-create-report": "./bin/npqc-create-report"
