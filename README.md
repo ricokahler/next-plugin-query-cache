@@ -52,14 +52,16 @@ Unlike Gatsby, Next.js does not provide any sort of shared data layer. This is n
 ### Install
 
 ```
-yarn add next-plugin-query-cache
+yarn add next-plugin-query-cache next@latest
 ```
 
 or
 
 ```
-npm i next-plugin-query-cache
+npm i next-plugin-query-cache next@latest
 ```
+
+> **NOTE:** this lib requires Next ^10.0.9
 
 ### Add to next.config.js
 
