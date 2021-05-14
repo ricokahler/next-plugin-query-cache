@@ -22,7 +22,7 @@ function createRequestListener({
   return async (req, res) => {
     try {
       const serializedRequest: SerializedRequest = req.body;
-      const cacheKey = await calculateCacheKey(serializedRequest.url);
+      const cacheKey = await calculateCacheKey(serializedRequest.url, serializedRequest);
 
       const requestState = cache.get(cacheKey) || { state: 'initial' };
 
