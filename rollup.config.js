@@ -3,13 +3,7 @@ import resolve from '@rollup/plugin-node-resolve';
 
 const extensions = ['.js', '.ts'];
 
-const external = [
-  /^@babel\/runtime/,
-  'express',
-  'webpack',
-  'node-fetch',
-  'next/dist/telemetry/trace/shared',
-];
+const external = [/^@babel\/runtime/, 'express', 'webpack', 'node-fetch'];
 
 const plugins = [
   resolve({ extensions, modulesOnly: true }),
